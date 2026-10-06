@@ -127,6 +127,7 @@ h3{font:italic 400 26px/1 'Instrument Serif',serif;padding:26px 0 8px;position:s
 const $=s=>document.querySelector(s),KEY='jam24-v1',root=document.documentElement;
 const P=(r,m)=>{const a=m/1440*2*Math.PI;return[r*Math.sin(a),-r*Math.cos(a)]},f=n=>n.toFixed(2);
 const hm=m=>{m=((Math.floor(m)%1440)+1440)%1440;return String(m/60|0).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+const hms=m=>{const s=Math.floor((m%1)*60);return hm(m)+':'+String(s).padStart(2,'0')};
 const dur=m=>{m=Math.round(m);const h=m/60|0,k=m%60;return(h?h+'j':'')+(k?(h?' ':'')+k+'m':'')||'0m'};
 const cut=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -193,7 +194,7 @@ function tick(){
 const d=new Date(),t=d.getHours()*60+d.getMinutes()+d.getSeconds()/60,C=2*Math.PI*212;
 const nk=dk(d);if(nk!==today){today=nk;blocks=(days[today]||{b:[]}).b;setDt();draw();hist()}
 $('#hand').style.transform=`rotate(${t/4}deg)`;$('#el').style.strokeDasharray=`${C*t/1440} ${C}`;$('#dotg').style.transform=`rotate(${d.getSeconds()*6}deg)`;
-let a='sekarang',b=hm(t),c,i;
+let a='sekarang',b=hms(t),c,i;
 const hit=blocks.filter(x=>[0,1440].some(k=>t+k>=x.s&&t+k<x.e)).sort((x,y)=>(x.e-x.s)-(y.e-y.s))[0];
 if(dr&&dr.len>0){a='rentang';b=dur(dr.len);c=hm(dr.s)+' – '+hm(dr.s+dr.len);i='lepas untuk mengisi'}
 else if(hv){const x=blocks.find(z=>z.id===hv);if(x){a=hm(x.s)+' – '+hm(x.e);b=dur(x.e-x.s);c=cut(x.n,24);i='klik untuk mengubah'}}
