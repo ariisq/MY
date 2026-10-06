@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>24 jam</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--fg:#000;--inv:0;--mut:rgba(0,0,0,.55);--line:rgba(0,0,0,.18);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--inv:1;--mut:rgba(255,255,255,.55);--line:rgba(255,255,255,.2);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#000;--fg:#fff;--inv:1;--mut:rgba(255,255,255,.55);--line:rgba(255,255,255,.2);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--fg);font:400 13px/1.5 'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;transition:background .5s,color .5s}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.09;filter:invert(var(--inv));background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.wrap{max-width:1100px;margin:0 auto;padding:22px clamp(16px,4vw,44px) 56px;display:grid;gap:22px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+h1{font:400 clamp(34px,6vw,58px)/.9 'Instrument Serif',Georgia,serif;letter-spacing:-.01em}
+h1 i{color:var(--mut)}
+.mut{color:var(--mut)}
+main{display:grid;gap:30px;align-items:center}
+@media(min-width:900px){main{grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr)}}
+#dial{width:100%;max-width:660px;height:auto;margin:auto;display:block;touch-action:none;cursor:crosshair;user-select:none;-webkit-user-select:none}
+#dial text{pointer-events:none}
+.fg{fill:var(--fg)}.pb{fill:var(--bg)}.pl{stroke:var(--fg);fill:none}
+.st{stroke:var(--fg);fill:none}.dsh{stroke-dasharray:1 5;opacity:.6}
+.kn{fill:var(--bg);stroke:var(--fg);stroke-width:1.5}
+.hl{stroke:var(--bg);stroke-width:4;opacity:.9}
+.nm{font:400 11px 'Instrument Sans',sans-serif;fill:var(--fg);text-anchor:middle;dominant-baseline:central;opacity:.7}
+.nm.c{font:italic 400 19px 'Instrument Serif',serif;opacity:1}
+.sm{font:400 11px 'Instrument Sans',sans-serif;fill:var(--fg);text-anchor:middle;opacity:.6}
+.big{font:400 66px 'Instrument Serif',serif;fill:var(--fg);text-anchor:middle;dominant-baseline:central;letter-spacing:-.02em}
+.who{font:italic 400 21px 'Instrument Serif',serif;fill:var(--fg);text-anchor:middle}
+#hand,#dotg{transform-origin:0 0;pointer-events:none}
+#hand{transition:transform 1.8s cubic-bezier(.2,.8,.2,1)}
+#el{transition:stroke-dasharray 1.8s cubic-bezier(.2,.8,.2,1)}
+.pv{fill:var(--fg);fill-opacity:.12;stroke:var(--fg);stroke-dasharray:3 3;pointer-events:none}
+.blk{cursor:pointer;animation:in .9s both cubic-bezier(.2,.8,.2,1);transition:filter .25s}
+.blk:hover{filter:invert(1)}
+.blk path:first-child{stroke:var(--fg);stroke-width:1}
+.bt{font:500 12px 'Instrument Sans',sans-serif;fill:var(--fg);stroke:var(--bg);stroke-width:4px;paint-order:stroke;stroke-linejoin:round;pointer-events:none}
+.bt.iv{fill:var(--bg);stroke:var(--fg)}
+@keyframes in{from{opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+aside{display:grid;gap:16px;align-content:start}
+h2{font:italic 400 28px/1 'Instrument Serif',serif}
+.meter{height:1px;background:var(--line);position:relative}
+.meter i{position:absolute;left:0;top:-1px;height:3px;background:var(--fg);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+ul{list-style:none;padding:0;display:grid}
+li{display:grid;grid-template-columns:26px 1fr auto;gap:14px;align-items:center;padding:11px 0;border-top:1px solid var(--line);cursor:pointer;transition:padding .25s}
+li:hover{padding-left:10px}
+li .n{font:400 20px/1.1 'Instrument Serif',serif}
+.sq{stroke:var(--fg)}
+button{font:500 12px 'Instrument Sans',sans-serif;color:inherit;background:none;border:1px solid var(--fg);padding:8px 15px;cursor:pointer;transition:background .2s,color .2s}
+button:hover,button.on{background:var(--fg);color:var(--bg)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sheet{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(440px,calc(100vw - 24px));transform:translate(-50%,150%);visibility:hidden;transition:transform .5s cubic-bezier(.2,.9,.2,1),visibility 0s .5s;background:var(--bg);border:1px solid var(--fg);padding:20px;display:grid;gap:16px;z-index:5}
+.sheet.open{transform:translate(-50%,0);visibility:visible;transition:transform .5s cubic-bezier(.2,.9,.2,1),visibility 0s}
+input{font:inherit;color:inherit;background:transparent;border:0;border-bottom:1px solid var(--fg);padding:7px 0;border-radius:0;width:100%}
+input:focus{outline:0}
+#nm{font:400 30px/1.1 'Instrument Serif',serif}
+.sw{padding:0;width:36px;height:36px;display:grid;place-items:center}
+.sw:hover{background:none}
+.sw.on{outline:2px solid var(--fg);outline-offset:2px;background:none}
+.sheet label{display:grid;gap:2px;flex:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>24 jam, <i>satu putaran.</i></h1>
+<div class="row"><span class="mut" id="dt"></span><button id="th" aria-label="ganti tema">◐</button></div>
+</header>
+<main>
+<svg id="dial" viewBox="-262 -262 524 524" aria-label="jam 24 jam, klik atau seret untuk mengisi kegiatan">
+<defs>
+<pattern id="pt2" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="pb" width="7" height="7"/><path class="pl" d="M0 0V7" stroke-width="1.6"/></pattern>
+<pattern id="pt3" width="8" height="8" patternUnits="userSpaceOnUse"><rect class="pb" width="8" height="8"/><circle class="fg" cx="4" cy="4" r="1.4"/></pattern>
+<pattern id="pt4" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect class="pb" width="7" height="7"/><path class="pl" d="M0 0V7M0 0H7"/></pattern>
+<pattern id="pt5" width="6" height="6" patternUnits="userSpaceOnUse"><rect class="pb" width="6" height="6"/><path class="pl" d="M0 3H6" stroke-width="1.2"/></pattern>
+</defs>
+<circle r="132" class="st dsh"/><circle r="206" class="st dsh"/>
+<path id="gd" class="st" stroke-width=".5" opacity=".22"/>
+<g id="tk"></g>
+<circle r="212" class="st" stroke-width=".4"/>
+<circle id="el" r="212" class="st" stroke-width="3" transform="rotate(-90)" style="stroke-dasharray:0 1332"/>
+<g id="gB"></g>
+<path id="pv" class="pv"/>
+<circle r="124" class="st" stroke-width=".5"/>
+<g id="dotg"><circle cy="-124" r="2.6" class="fg"/></g>
+<g id="hand" style="transform:rotate(0deg)"><line y1="-126" y2="-250" class="hl"/><line y1="-126" y2="-250" class="st" stroke-width="1.2"/><circle cy="-212" r="5" class="kn"/></g>
+<text id="c1" class="sm" y="-42"></text>
+<text id="c2" class="big" y="4"></text>
+<text id="c3" class="who" y="42"></text>
+<text id="c4" class="sm" y="62"></text>
+</svg>
+<aside>
+<h2>hari ini</h2>
+<div id="st" class="mut"></div>
+<div class="meter"><i id="mt" style="width:0"></i></div>
+<ul id="ls"></ul>
+<div class="row"><button id="ad">tambah kegiatan</button><button id="rs">kosongkan</button></div>
+<p class="mut">Klik di cincin jam untuk blok 1 jam. Seret untuk rentang bebas, misalnya 07 sampai 09. Klik blok untuk mengubahnya.</p>
+</aside>
+</main>
+</div>
+<div class="sheet" id="sheet" aria-hidden="true">
+<input id="nm" placeholder="mau ngapain di jam ini?" maxlength="40" autocomplete="off">
+<div class="row"><label class="mut">dari<input type="time" id="ts" step="900"></label><label class="mut">sampai<input type="time" id="te" step="900"></label></div>
+<div class="row" id="sws"></div>
+<div class="row"><button id="sv">simpan</button><button id="ca">batal</button><button id="del" style="margin-left:auto">hapus</button></div>
+</div>
+<script>
+const $=s=>document.querySelector(s),KEY='jam24-v1',root=document.documentElement;
+const P=(r,m)=>{const a=m/1440*2*Math.PI;return[r*Math.sin(a),-r*Math.cos(a)]},f=n=>n.toFixed(2);
+const hm=m=>{m=((Math.floor(m)%1440)+1440)%1440;return String(m/60|0).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+const dur=m=>{m=Math.round(m);const h=m/60|0,k=m%60;return(h?h+'j':'')+(k?(h?' ':'')+k+'m':'')||'0m'};
+const cut=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fillOf=p=>p===0?'var(--fg)':p===1?'var(--bg)':`url(#pt${p})`;
+const R0=132,R1=206;
+function arc(s,e,r0,r1){const[a,b]=P(r1,s),[c,d]=P(r1,e),[g,h]=P(r0,e),[i,j]=P(r0,s),L=e-s>720?1:0;return`M${f(a)} ${f(b)}A${r1} ${r1} 0 ${L} 1 ${f(c)} ${f(d)}L${f(g)} ${f(h)}A${r0} ${r0} 0 ${L} 0 ${f(i)} ${f(j)}Z`}
+let blocks=null;
+try{blocks=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+if(!Array.isArray(blocks))blocks=[[1350,1770,'tidur',3],[330,390,'olahraga',0],[390,420,'siap-siap',1],[420,540,'kegiatan A',2],[540,720,'fokus kerja',0],[720,780,'makan siang',1],[780,1020,'kerja',4],[1080,1260,'santai',5]].map(([s,e,n,p],i)=>({id:i+1,s,e,n,p}));
+let uid=Math.max(0,...blocks.map(b=>b.id))+1,ed=null,hv=null,dr=null;
+const sv=()=>{try{localStorage.setItem(KEY,JSON.stringify(blocks))}catch(e){}};
+const ov=(a,b)=>[-1440,0,1440].some(k=>a.s<b.e+k&&b.s+k<a.e),LN=new Map();
+function lanes(){const L=[];[...blocks].sort((a,b)=>a.s-b.s).forEach(b=>{let i=0;while(L[i]&&L[i].some(c=>ov(b,c)))i++;(L[i]=L[i]||[]).push(b);LN.set(b.id,i)});return L.length||1}
+// ticks
+let t1='',t2='',t3='',nums='',gd='';
+for(let m=0;m<1440;m+=15){const h=m%60===0,hf=m%30===0,[a,b]=P(h?236:hf?241:244,m),[c,d]=P(250,m),s=`M${f(a)} ${f(b)}L${f(c)} ${f(d)}`;if(h)t1+=s;else if(hf)t2+=s;else t3+=s;
+if(h){const k=m/60,[x,y]=P(226,m);nums+=`<text class="nm${k%6?'':' c'}" x="${f(x)}" y="${f(y)}">${String(k).padStart(2,'0')}</text>`;const[p,q]=P(R0,m),[r,u]=P(R1,m);gd+=`M${f(p)} ${f(q)}L${f(r)} ${f(u)}`}}
+$('#tk').innerHTML=`<path class="st" stroke-width="1.5" d="${t1}"/><path class="st" stroke-width=".9" d="${t2}"/><path class="st" stroke-width=".5" d="${t3}"/>${nums}`;
+$('#gd').setAttribute('d',gd);
+function draw(){
+const n=lanes(),w=(R1-R0)/n;
+$('#gB').innerHTML=blocks.map((b,i)=>{
+const l=LN.get(b.id),r0=R0+l*w+(n>1?1:0),r1=R0+(l+1)*w-(n>1?1:0),r=(r0+r1)/2,mid=(b.s+b.e)/2%1440,rv=mid>360&&mid<1080;
+const len=r*(b.e-b.s)/1440*2*Math.PI,fs=Math.max(7,Math.min(13,(r1-r0)*.34)),cap=Math.floor((len-12)/(fs*.6)),txt=cap>=3?cut(b.n,cap):'';
+const[x1,y1]=P(r,rv?b.e:b.s),[x2,y2]=P(r,rv?b.s:b.e),tp=`M${f(x1)} ${f(y1)}A${r} ${r} 0 ${b.e-b.s>720?1:0} ${rv?0:1} ${f(x2)} ${f(y2)}`;
+return`<g class="blk" data-id="${b.id}" style="animation-delay:${i*70}ms"><path d="${arc(b.s,b.e,r0,r1)}" style="fill:${fillOf(b.p)}"/>${txt?`<path id="tp${b.id}" d="${tp}" fill="none"/><text class="bt${b.p===0?' iv':''}" style="font-size:${fs}px" dy=".35em" text-anchor="middle"><textPath href="#tp${b.id}" startOffset="50%">${esc(txt)}</textPath></text>`:''}</g>`}).join('');
+list()}
+function list(){
+const o=[...blocks].sort((a,b)=>a.s-b.s),cov=new Uint8Array(1440);
+blocks.forEach(b=>{for(let m=b.s;m<b.e;m++)cov[m%1440]=1});const fl=cov.reduce((a,b)=>a+b,0);
+$('#st').innerHTML=`terisi ${dur(fl)}, kosong ${dur(1440-fl)}`;$('#mt').style.width=fl/14.4+'%';
+$('#ls').innerHTML=o.map(b=>`<li data-id="${b.id}"><svg width="26" height="26"><rect width="26" height="26" class="sq" style="fill:${fillOf(b.p)}"/></svg><span><span class="n">${esc(b.n)}</span><br><span class="mut">${hm(b.s)} – ${hm(b.e)}</span></span><span class="mut">${dur(b.e-b.s)}</span></li>`).join('')||'<li class="mut" style="cursor:default">belum ada kegiatan. klik cincin jam.</li>'}
+function tick(){
+const d=new Date(),t=d.getHours()*60+d.getMinutes()+d.getSeconds()/60,C=2*Math.PI*212;
+$('#hand').style.transform=`rotate(${t/4}deg)`;$('#el').style.strokeDasharray=`${C*t/1440} ${C}`;$('#dotg').style.transform=`rotate(${d.getSeconds()*6}deg)`;
+let a='sekarang',b=hm(t),c,i;
+const hit=blocks.filter(x=>[0,1440].some(k=>t+k>=x.s&&t+k<x.e)).sort((x,y)=>(x.e-x.s)-(y.e-y.s))[0];
+if(dr&&dr.len>0){a='rentang';b=dur(dr.len);c=hm(dr.s)+' – '+hm(dr.s+dr.len);i='lepas untuk mengisi'}
+else if(hv){const x=blocks.find(z=>z.id===hv);if(x){a=hm(x.s)+' – '+hm(x.e);b=dur(x.e-x.s);c=cut(x.n,24);i='klik untuk mengubah'}}
+if(c===undefined){if(hit){const k=t+1440>=hit.s&&t+1440<hit.e?1440:0;c=cut(hit.n,24);i='tersisa '+dur(hit.e-t-k)}
+else{const nx=[...blocks].sort((x,y)=>(((x.s-t)%1440)+1440)%1440-(((y.s-t)%1440)+1440)%1440)[0];c='senggang';i=nx?'berikutnya '+cut(nx.n,16)+' pukul '+hm(nx.s):'klik cincin jam untuk mulai'}}
+$('#c1').textContent=a;$('#c2').textContent=b;$('#c3').textContent=c;$('#c4').textContent=i}
+// pointer
+const svg=$('#dial'),pv=$('#pv');
+function mins(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse());return{d:Math.hypot(q.x,q.y),m:((Math.atan2(q.x,-q.y)/(2*Math.PI)*1440)+1440)%1440}}
+svg.addEventListener('pointerdown',e=>{const q=mins(e);if(q.d<120)return;svg.setPointerCapture(e.pointerId);const g=document.elementFromPoint(e.clientX,e.clientY),h=g&&g.closest('[data-id]');dr={a:Math.round(q.m/15)*15%1440,raw:q.m,s:0,len:0,id:h?+h.dataset.id:null}});
+svg.addEventListener('pointermove',e=>{if(!dr)return;const m=Math.round(mins(e).m/15)*15%1440,d=(((m-dr.a+720)%1440)+1440)%1440-720;dr.len=Math.abs(d);dr.s=d<0?(dr.a+d+1440)%1440:dr.a;pv.setAttribute('d',dr.len?arc(dr.s,dr.s+dr.len,R0,R1):'');tick()});
+svg.addEventListener('pointerup',()=>{if(!dr)return;const x=dr;dr=null;pv.setAttribute('d','');
+if(x.len>=15)openEd({s:x.s,e:x.s+x.len,n:'',p:blocks.length%6});
+else if(x.id)openEd(blocks.find(b=>b.id===x.id));
+else{const s=Math.floor(x.raw/60)*60;openEd({s,e:s+60,n:'',p:blocks.length%6})}tick()});
+svg.addEventListener('pointercancel',()=>{dr=null;pv.setAttribute('d','');tick()});
+svg.addEventListener('pointerover',e=>{if(dr)return;const h=e.target.closest('[data-id]');hv=h?+h.dataset.id:null;tick()});
+svg.addEventListener('pointerleave',()=>{if(!dr){hv=null;tick()}});
+// editor
+$('#sws').innerHTML=[0,1,2,3,4,5].map(p=>`<button class="sw" data-p="${p}" aria-label="pola ${p+1}"><svg width="26" height="26"><rect width="26" height="26" class="sq" style="fill:${fillOf(p)}"/></svg></button>`).join('');
+const setP=p=>{ed.p=p;[...$('#sws').children].forEach(x=>x.classList.toggle('on',+x.dataset.p===p))};
+$('#sws').onclick=e=>{const b=e.target.closest('[data-p]');if(b)setP(+b.dataset.p)};
+function openEd(b){ed={...b};$('#nm').value=b.n||'';$('#ts').value=hm(b.s);$('#te').value=hm(b.e);setP(b.p);$('#del').style.display=b.id?'':'none';$('#sheet').classList.add('open');$('#sheet').setAttribute('aria-hidden','false');setTimeout(()=>$('#nm').focus(),80)}
+function closeEd(){$('#sheet').classList.remove('open');$('#sheet').setAttribute('aria-hidden','true');ed=null}
+const toM=v=>{const[h,m]=(v||'0:0').split(':').map(Number);return h*60+m};
+function save(){if(!ed)return;let s=toM($('#ts').value),e=toM($('#te').value);if(e<=s)e+=1440;if(e-s>1439)e=s+1439;
+const n=$('#nm').value.trim()||'tanpa judul';
+if(ed.id){Object.assign(blocks.find(b=>b.id===ed.id),{s,e,n,p:ed.p})}else blocks.push({id:uid++,s,e,n,p:ed.p});
+sv();draw();closeEd();tick()}
+$('#sv').onclick=save;$('#ca').onclick=closeEd;
+$('#del').onclick=()=>{blocks=blocks.filter(b=>b.id!==ed.id);sv();draw();closeEd();tick()};
+$('#ad').onclick=()=>{const s=(Math.floor(new Date().getHours())+1)%24*60;openEd({s,e:s+60,n:'',p:blocks.length%6})};
+$('#ls').onclick=e=>{const li=e.target.closest('[data-id]');if(li)openEd(blocks.find(b=>b.id===+li.dataset.id))};
+$('#ls').onpointerover=e=>{const li=e.target.closest('[data-id]');hv=li?+li.dataset.id:null;tick()};
+$('#ls').onpointerleave=()=>{hv=null;tick()};
+const rs=$('#rs');
+rs.onclick=()=>{if(rs.dataset.a){blocks=[];sv();draw();tick();rs.textContent='kosongkan';delete rs.dataset.a}else{rs.dataset.a=1;rs.textContent='yakin? klik lagi';setTimeout(()=>{rs.textContent='kosongkan';delete rs.dataset.a},3000)}};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEd();if(e.key==='Enter'&&ed&&e.target.id==='nm')save()});
+// tema
+try{const t=localStorage.getItem(KEY+'t');if(t)root.dataset.theme=t}catch(e){}
+$('#th').onclick=()=>{const dark=getComputedStyle(root).getPropertyValue('--inv').trim()==='1',t=dark?'light':'dark';root.dataset.theme=t;try{localStorage.setItem(KEY+'t',t)}catch(e){}};
+$('#dt').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});
+draw();tick();requestAnimationFrame(()=>requestAnimationFrame(tick));setInterval(tick,1000);
+</script>
+</body>
+</html>
