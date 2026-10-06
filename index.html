@@ -239,7 +239,7 @@ $('#th').onclick=()=>{const dark=getComputedStyle(root).getPropertyValue('--inv'
 setDt();
 hist();draw();tick();requestAnimationFrame(()=>requestAnimationFrame(tick));setInterval(tick,1000);
 if(KY)sync(1);else askKey();
-setInterval(()=>{if(!document.hidden)sync()},20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});addEventListener('online',()=>sync(1));
+setInterval(()=>{if(!document.hidden)sync()},60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});addEventListener('online',()=>sync(1));
 </script>
 </body>
 </html>
