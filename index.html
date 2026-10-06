@@ -65,6 +65,13 @@ input:focus{outline:0}
 .sw:hover{background:none}
 .sw.on{outline:2px solid var(--fg);outline-offset:2px;background:none}
 .sheet label{display:grid;gap:2px;flex:1}
+section{display:grid;gap:6px}
+article{display:grid;grid-template-columns:110px 120px 1fr;gap:22px;align-items:center;padding:20px 0;border-top:1px solid var(--line)}
+.dd b{display:block;font:400 58px/1 'Instrument Serif',serif}
+.mini{width:120px;height:120px}.mini path{stroke:var(--fg);stroke-width:.8}
+.lg li{grid-template-columns:104px 1fr auto;padding:5px 0;border:0;cursor:default}.lg li:hover{padding-left:0}
+h3{font:italic 400 26px/1 'Instrument Serif',serif;padding:26px 0 8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:1}
+@media(max-width:600px){article{grid-template-columns:96px 1fr}.lg{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -101,10 +108,12 @@ input:focus{outline:0}
 <div id="st" class="mut"></div>
 <div class="meter"><i id="mt" style="width:0"></i></div>
 <ul id="ls"></ul>
-<div class="row"><button id="ad">tambah kegiatan</button><button id="rs">kosongkan</button></div>
-<p class="mut">Klik di cincin jam untuk blok 1 jam. Seret untuk rentang bebas, misalnya 07 sampai 09. Klik blok untuk mengubahnya.</p>
+<div class="row"><button id="ad">tambah kegiatan</button><button id="rs">kosongkan</button><button id="cp" hidden>salin dari kemarin</button></div>
+<p id="sy" class="mut">tersimpan di browser ini</p>
+<p class="mut">Klik di cincin jam untuk blok 1 jam. Seret untuk rentang bebas, misalnya 07 sampai 09. Klik blok untuk mengubahnya. Lewat jam 00.00, kegiatan hari ini otomatis pindah ke catatan di bawah.</p>
 </aside>
 </main>
+<section><h2>catatan harian</h2><div id="hs"></div><div id="sn" style="height:1px"></div></section>
 </div>
 <div class="sheet" id="sheet" aria-hidden="true">
 <input id="nm" placeholder="mau ngapain di jam ini?" maxlength="40" autocomplete="off">
@@ -122,11 +131,24 @@ const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
 const fillOf=p=>p===0?'var(--fg)':p===1?'var(--bg)':`url(#pt${p})`;
 const R0=132,R1=206;
 function arc(s,e,r0,r1){const[a,b]=P(r1,s),[c,d]=P(r1,e),[g,h]=P(r0,e),[i,j]=P(r0,s),L=e-s>720?1:0;return`M${f(a)} ${f(b)}A${r1} ${r1} 0 ${L} 1 ${f(c)} ${f(d)}L${f(g)} ${f(h)}A${r0} ${r0} 0 ${L} 0 ${f(i)} ${f(j)}Z`}
-let blocks=null;
-try{blocks=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
-if(!Array.isArray(blocks))blocks=[[1350,1770,'tidur',3],[330,390,'olahraga',0],[390,420,'siap-siap',1],[420,540,'kegiatan A',2],[540,720,'fokus kerja',0],[720,780,'makan siang',1],[780,1020,'kerja',4],[1080,1260,'santai',5]].map(([s,e,n,p],i)=>({id:i+1,s,e,n,p}));
-let uid=Math.max(0,...blocks.map(b=>b.id))+1,ed=null,hv=null,dr=null;
-const sv=()=>{try{localStorage.setItem(KEY,JSON.stringify(blocks))}catch(e){}};
+const dk=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const setDt=()=>{$('#dt').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'})};
+let today=dk(new Date()),days={},hk=[],shown=0,pm='',remote=null,busy=0,tm=0,dirty=new Set();
+try{days=JSON.parse(localStorage.getItem(KEY+'d')||'null')||{};const o=JSON.parse(localStorage.getItem(KEY)||'null');if(Array.isArray(o)&&!days[today]){days[today]={u:Date.now(),b:o};localStorage.setItem(KEY+'d',JSON.stringify(days));localStorage.removeItem(KEY)}}catch(e){}
+let blocks=(days[today]||{b:[]}).b;
+let uid=Math.max(0,...Object.values(days).flatMap(x=>x.b).map(b=>b.id||0))+1,ed=null,hv=null,dr=null;
+const sl=()=>{try{localStorage.setItem(KEY+'d',JSON.stringify(days))}catch(e){}};
+const sv=()=>{days[today]={u:Date.now(),b:blocks};sl();push(today.slice(0,7))};
+function push(m){dirty.add(m);clearTimeout(tm);tm=setTimeout(flush,800)}
+async function flush(){if(busy||!remote)return;busy=1;let m;try{while(m=[...dirty][0]){const o={};for(const k in days)if(k.startsWith(m))o[k]=days[k];await remote.doc(m).set({days:o});dirty.delete(m)}$('#sy').textContent='tersimpan di akun, aman antar perangkat'}catch(e){$('#sy').textContent='belum tersinkron, data tetap aman di browser ini'}busy=0}
+function ent(k){const b=days[k].b,d=new Date(k+'T00:00'),mo=k.slice(0,7),L=d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+const sg=b.map(x=>`<path d="${arc(x.s,x.e,48,98)}" style="fill:${fillOf(x.p)}"/>`).join('');
+const rw=[...b].sort((x,y)=>x.s-y.s).map(x=>`<li><span class="mut">${hm(x.s)} – ${hm(x.e)}</span><span>${esc(x.n)}</span><span class="mut">${dur(x.e-x.s)}</span></li>`).join('');
+return(mo!==pm?`<h3>${L}</h3>`:'')+`<article><div class="dd"><b>${d.getDate()}</b><span class="mut">${d.toLocaleDateString('id-ID',{weekday:'long'})}</span></div><svg viewBox="-104 -104 208 208" class="mini"><circle r="98" class="st" stroke-width=".6"/>${sg}<circle r="48" class="st" stroke-width=".6"/><path class="st" d="M0 -104V-96M104 0H96M0 104V96M-104 0H-96"/></svg><ul class="lg">${rw}</ul></article>`}
+function more(){if(shown>=hk.length)return;let h='';hk.slice(shown,shown+14).forEach(k=>{h+=ent(k);pm=k.slice(0,7)});shown+=14;$('#hs').insertAdjacentHTML('beforeend',h)}
+function hist(){hk=Object.keys(days).filter(k=>k<today&&days[k].b&&days[k].b.length).sort().reverse();shown=0;pm='';$('#hs').innerHTML=hk.length?'':'<p class="mut">arsip masih kosong. tiap lewat jam 00.00, kegiatan hari ini pindah ke sini.</p>';more()}
+new IntersectionObserver(e=>{if(e[0].isIntersecting)more()},{rootMargin:'400px'}).observe($('#sn'));
+$('#cp').onclick=()=>{const o=days[$('#cp').dataset.k];if(!o)return;blocks=o.b.map(x=>({...x,id:uid++}));sv();draw();tick()};
 const ov=(a,b)=>[-1440,0,1440].some(k=>a.s<b.e+k&&b.s+k<a.e),LN=new Map();
 function lanes(){const L=[];[...blocks].sort((a,b)=>a.s-b.s).forEach(b=>{let i=0;while(L[i]&&L[i].some(c=>ov(b,c)))i++;(L[i]=L[i]||[]).push(b);LN.set(b.id,i)});return L.length||1}
 // ticks
@@ -147,9 +169,11 @@ function list(){
 const o=[...blocks].sort((a,b)=>a.s-b.s),cov=new Uint8Array(1440);
 blocks.forEach(b=>{for(let m=b.s;m<b.e;m++)cov[m%1440]=1});const fl=cov.reduce((a,b)=>a+b,0);
 $('#st').innerHTML=`terisi ${dur(fl)}, kosong ${dur(1440-fl)}`;$('#mt').style.width=fl/14.4+'%';
+const pk=Object.keys(days).filter(k=>k<today&&days[k].b.length).sort().pop(),cp=$('#cp');cp.hidden=blocks.length>0||!pk;cp.dataset.k=pk||'';
 $('#ls').innerHTML=o.map(b=>`<li data-id="${b.id}"><svg width="26" height="26"><rect width="26" height="26" class="sq" style="fill:${fillOf(b.p)}"/></svg><span><span class="n">${esc(b.n)}</span><br><span class="mut">${hm(b.s)} – ${hm(b.e)}</span></span><span class="mut">${dur(b.e-b.s)}</span></li>`).join('')||'<li class="mut" style="cursor:default">belum ada kegiatan. klik cincin jam.</li>'}
 function tick(){
 const d=new Date(),t=d.getHours()*60+d.getMinutes()+d.getSeconds()/60,C=2*Math.PI*212;
+const nk=dk(d);if(nk!==today){today=nk;blocks=(days[today]||{b:[]}).b;setDt();draw();hist()}
 $('#hand').style.transform=`rotate(${t/4}deg)`;$('#el').style.strokeDasharray=`${C*t/1440} ${C}`;$('#dotg').style.transform=`rotate(${d.getSeconds()*6}deg)`;
 let a='sekarang',b=hm(t),c,i;
 const hit=blocks.filter(x=>[0,1440].some(k=>t+k>=x.s&&t+k<x.e)).sort((x,y)=>(x.e-x.s)-(y.e-y.s))[0];
@@ -193,8 +217,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEd();if(e.key==
 // tema
 try{const t=localStorage.getItem(KEY+'t');if(t)root.dataset.theme=t}catch(e){}
 $('#th').onclick=()=>{const dark=getComputedStyle(root).getPropertyValue('--inv').trim()==='1',t=dark?'light':'dark';root.dataset.theme=t;try{localStorage.setItem(KEY+'t',t)}catch(e){}};
-$('#dt').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});
-draw();tick();requestAnimationFrame(()=>requestAnimationFrame(tick));setInterval(tick,1000);
+setDt();
+hist();draw();tick();requestAnimationFrame(()=>requestAnimationFrame(tick));setInterval(tick,1000);
+(async()=>{try{const[u,db]=await Promise.all([claude.use('user'),claude.use('db')]),id=u&&await u.id();if(!db||!id)return;const col=db.collection('data/users/'+id),q=await col.get(),rd={};
+q.docs.forEach(x=>Object.assign(rd,JSON.parse(JSON.stringify((x.data()||{}).days||{}))));let ch=0;
+for(const k in rd)if(!days[k]||rd[k].u>days[k].u){days[k]=rd[k];ch=1}
+for(const k in days)if(!rd[k]||rd[k].u<days[k].u)dirty.add(k.slice(0,7));
+remote=col;if(ch){blocks=(days[today]||{b:[]}).b;sl();draw();hist()}flush()}catch(e){}})();
 </script>
 </body>
 </html>
